@@ -33,7 +33,7 @@ Wrap your app with `GlobalAlertProvider` and provide your custom alert modal com
 
 ```tsx
 import React from 'react';
-import { GlobalAlertProvider, GlobalAlert } from 'react-native-global-modal';
+import { GlobalAlertProvider, GlobalAlert } from '@hexhad/react-native-global-modal';
 import CustomAlertModal from './components/CustomAlertModal';
 
 export default function App() {
@@ -50,7 +50,7 @@ export default function App() {
 ```tsx
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import type { AlertModalProps } from 'react-native-global-modal';
+import type { AlertModalProps } from '@hexhad/react-native-global-modal';
 
 const CustomAlertModal: React.FC<AlertModalProps> = ({ visible, data, onClose }) => {
   if (!data) return null;
@@ -144,7 +144,7 @@ export default CustomAlertModal;
 #### Using Global Object (Imperative API)
 
 ```tsx
-import { GlobalAlert } from 'react-native-global-modal';
+import { GlobalAlert } from '@hexhad/react-native-global-modal';
 
 // Simple alert
 GlobalAlert.show({
@@ -190,7 +190,7 @@ GlobalAlert.hide();
 ```tsx
 import React from 'react';
 import { View, Button } from 'react-native';
-import { useGlobalAlert } from 'react-native-global-modal';
+import { useGlobalAlert } from '@hexhad/react-native-global-modal';
 
 const MyComponent: React.FC = () => {
   const alert = useGlobalAlert();
@@ -387,7 +387,7 @@ import type {
   AlertButton, 
   AlertModalProps, 
   GlobalAlertInstance 
-} from 'react-native-global-modal';
+} from '@hexhad/react-native-global-modal';
 ```
 
 ## Contributing

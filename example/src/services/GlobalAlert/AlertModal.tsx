@@ -17,7 +17,7 @@ const AlertModal: React.FC<AlertModalProps> = ({ visible, data, onClose }) => {
   if (!data || !visible) return null
 
   return (
-    <Modal transparent animationType="none" visible={visible}>
+    <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           {/* Title */}
