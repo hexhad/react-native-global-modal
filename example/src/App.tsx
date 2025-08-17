@@ -18,9 +18,9 @@ const App: React.FC = () => {
 
   const onPressAlertsButtonHandler = () => {
     GlobalAlert.show({
-      title: 'Global Alert 1 ',
-      p: GlobalAlert.P.L,
-      message: 'This is Global Alert',
+      title: 'LOW IGNORING ALERT 1',
+      p: GlobalAlert.P.LOW,
+      message: 'LOW IGNORING ALERT 1',
       variant: GlobalAlert.TYPE.ERROR,
       buttons: [
         {
@@ -31,9 +31,9 @@ const App: React.FC = () => {
       ],
     });
     GlobalAlert.show({
-      title: 'Global Alert 2',
-      p: GlobalAlert.P.H,
-      message: 'This is Global Alert',
+      title: 'HIGH SHOWING ALERT 1',
+      p: GlobalAlert.P.HIGH,
+      message: 'HIGH SHOWING ALERT 1',
       variant: GlobalAlert.TYPE.ERROR,
       buttons: [
         {
@@ -44,9 +44,9 @@ const App: React.FC = () => {
       ],
     });
     GlobalAlert.show({
-      title: 'Global Alert 3',
-      p: GlobalAlert.P.L,
-      message: 'This is Global Alert',
+      title: 'LOW IGNORING ALERT 2',
+      p: GlobalAlert.P.LOW,
+      message: 'LOW IGNORING ALERT 2',
       variant: GlobalAlert.TYPE.ERROR,
       buttons: [
         {
@@ -63,9 +63,9 @@ const App: React.FC = () => {
     });
 
     GlobalAlert.show({
-      title: 'Global Alert 44',
-      p: GlobalAlert.P.H,
-      message: 'This is Global Alert',
+      title: 'HIGH SHOWING ALERT 2',
+      p: GlobalAlert.P.HIGH,
+      message: 'HIGH SHOWING ALERT 2',
       variant: GlobalAlert.TYPE.ERROR,
       buttons: [
         {
@@ -76,12 +76,10 @@ const App: React.FC = () => {
       ],
     });
 
-  }
-  const onPressAlertButtonHandler = () => {
     GlobalAlert.show({
-      title: 'Global Alert 1 ',
-      p: GlobalAlert.P.L,
-      message: 'This is Global Alert',
+      title: 'LOW IGNORING ALERT 3',
+      p: GlobalAlert.P.LOW,
+      message: 'LOW IGNORING ALERT 3',
       variant: GlobalAlert.TYPE.ERROR,
       buttons: [
         {
@@ -89,8 +87,14 @@ const App: React.FC = () => {
           variant: GlobalAlert.TYPE.ERROR,
           onPress: () => GlobalAlert.hide(),
         },
+        {
+          title: 'ERROR',
+          variant: GlobalAlert.TYPE.ERROR,
+          onPress: () => GlobalAlert.hide(),
+        },
       ],
     });
+
   }
 
   return (
@@ -101,8 +105,7 @@ const App: React.FC = () => {
     >
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Global Alert</Text>
-        <CustomButton title='Open Alerts' onPress={onPressAlertsButtonHandler}/>
-        <CustomButton title='Open Alert' onPress={onPressAlertButtonHandler}/>
+        <CustomButton title='Open Alerts' onPress={onPressAlertsButtonHandler} />
       </View>
     </GlobalAlertProvider>
   );

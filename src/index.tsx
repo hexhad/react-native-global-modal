@@ -33,8 +33,8 @@ export type AlertModalRef = {
 }
 
 export type Priority = {
-  L: number // Low
-  H: number // High
+  LOW: number
+  HIGH: number
 }
 
 export type GlobalAlertInstance = {
@@ -93,8 +93,8 @@ export const GlobalAlert = {
     TIP: 'TIP',
   },
   P: {
-    L: 0,
-    H: 1
+    LOW: 0,
+    HIGH: 1
   }
 }
 
@@ -102,7 +102,7 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
   children,
   AlertModal,
 }) => {
-  const queueRef = useRef<AlertData[]>([])
+  const alertQueueRef = useRef<AlertData[]>([])
   const showingRef = useRef(false)
   const mountedRef = useRef(false)
   const currentAlertRef = useRef<AlertData | null>(null)
@@ -115,71 +115,66 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
     alertRef.current?.hide?.()
     showingRef.current = false
     currentAlertRef.current = null
-    processQueue()
+    // Process next alert in queue after a small delay to ensure state updates
+    setTimeout(() => {
+      processQueue()
+    }, 50)
   }, [])
 
   const processQueue = useCallback(() => {
-    if (showingRef.current || queueRef.current.length === 0) return
+    if (showingRef.current) return
 
-    // LIFO - Last In First Out
-    const next = queueRef.current.pop()
-    if (!next) return
+    // Show the last (most recent) item from the queue
+    if (alertQueueRef.current.length > 0) {
+      const nextAlert = alertQueueRef.current.pop()! // Take from end (most recent)
+      
+      showingRef.current = true
+      currentAlertRef.current = nextAlert
 
-    showingRef.current = true
-    currentAlertRef.current = next
-
-    const originalOnClose = next.onClose
-    const safeOnClose = () => {
-      try {
-        originalOnClose?.()
-      } finally {
-        hide()
+      const originalOnClose = nextAlert.onClose
+      const safeOnClose = () => {
+        try {
+          originalOnClose?.()
+        } finally {
+          hide()
+        }
       }
-    }
-
-    setTimeout(() => {
+      
       alertRef.current?.show?.({
-        ...next,
+        ...nextAlert,
         onClose: safeOnClose,
       })
-    }, 100)
+    }
   }, [hide])
 
   const show = useCallback((options: AlertData) => {
     const alertOptions = { p: 0, ...options }
-
-    queueRef.current = queueRef.current.filter(item => item.p === 1)
-
+    
+    // Filter queue to keep only HIGH priority items before adding new item
+    alertQueueRef.current = alertQueueRef.current.filter(alert => alert.p === 1)
+    
+    // If something is currently showing, move it back to the queue
     if (showingRef.current && currentAlertRef.current) {
+      // If the current alert is HIGH priority, put it back in the queue
       if (currentAlertRef.current.p === 1) {
-        queueRef.current.push(currentAlertRef.current)
+        alertQueueRef.current.push(currentAlertRef.current)
       }
+      // Close the current alert
       alertRef.current?.hide?.()
       showingRef.current = false
       currentAlertRef.current = null
     }
-
-    showingRef.current = true
-    currentAlertRef.current = alertOptions
-
-    const originalOnClose = alertOptions.onClose
-    const safeOnClose = () => {
-      try {
-        originalOnClose?.()
-      } finally {
-        hide()
-      }
-    }
-
-    alertRef.current?.show?.({
-      ...alertOptions,
-      onClose: safeOnClose,
-    })
-  }, [hide])
+    
+    // Add the new alert to the end of the queue
+    alertQueueRef.current.push(alertOptions)
+    
+    // Show the latest (newest) alert immediately
+    processQueue()
+  }, [processQueue])
 
   useEffect(() => {
     mountedRef.current = true
-    
+
     GlobalAlert.show = show
     GlobalAlert.hide = hide
 
@@ -187,8 +182,8 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
       mountedRef.current = false
       GlobalAlert.show = (opts: AlertData) =>
         console.error('GlobalAlertProvider unmounted; cannot show alert.', opts)
-      GlobalAlert.hide = () => {}
-      queueRef.current = []
+      GlobalAlert.hide = () => { }
+      alertQueueRef.current = []
       showingRef.current = false
       currentAlertRef.current = null
     }
