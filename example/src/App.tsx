@@ -17,88 +17,15 @@ const ALERT_TYPES = {
 const App: React.FC = () => {
 
   const onPressAlertsButtonHandler = () => {
-    GlobalAlert.show({
-      title: 'LOW IGNORING ALERT 1',
-      p: GlobalAlert.P.LOW,
-      message: 'LOW IGNORING ALERT 1',
-      variant: GlobalAlert.TYPE.ERROR,
-      buttons: [
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-      ],
-    });
-    GlobalAlert.show({
-      title: 'HIGH SHOWING ALERT 1',
-      p: GlobalAlert.P.HIGH,
-      message: 'HIGH SHOWING ALERT 1',
-      variant: GlobalAlert.TYPE.ERROR,
-      buttons: [
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-      ],
-    });
-    GlobalAlert.show({
-      title: 'LOW IGNORING ALERT 2',
-      p: GlobalAlert.P.LOW,
-      message: 'LOW IGNORING ALERT 2',
-      variant: GlobalAlert.TYPE.ERROR,
-      buttons: [
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-      ],
-    });
-
-    GlobalAlert.show({
-      title: 'HIGH SHOWING ALERT 2',
-      p: GlobalAlert.P.HIGH,
-      message: 'HIGH SHOWING ALERT 2',
-      variant: GlobalAlert.TYPE.ERROR,
-      buttons: [
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-      ],
-    });
-
-    GlobalAlert.show({
-      title: 'LOW IGNORING ALERT 3',
-      p: GlobalAlert.P.LOW,
-      message: 'LOW IGNORING ALERT 3',
-      variant: GlobalAlert.TYPE.ERROR,
-      buttons: [
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-        {
-          title: 'ERROR',
-          variant: GlobalAlert.TYPE.ERROR,
-          onPress: () => GlobalAlert.hide(),
-        },
-      ],
-    });
-
+    GlobalAlert.show({ message: 'HIGH 1', p: GlobalAlert.P.HIGH });
+    GlobalAlert.show({ message: 'LOW 1', p: GlobalAlert.P.LOW });
+    GlobalAlert.show({ message: 'HIGH 2', p: GlobalAlert.P.HIGH });
+    GlobalAlert.show({ message: 'LOW 2', p: GlobalAlert.P.LOW });
   }
 
   return (
     <GlobalAlertProvider
+      ignorePriority={true}
       AlertModal={AlertModal}
       types={ALERT_TYPES}
       globalAlert={GlobalAlert}
