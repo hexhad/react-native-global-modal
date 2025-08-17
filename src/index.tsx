@@ -49,6 +49,7 @@ export type GlobalAlertProviderProps = {
   AlertModal: React.ComponentType<AlertModalProps>
   types?: Record<string, string>
   globalAlert?: GlobalAlertInstance
+  ignorePriority?: boolean
 }
 
 const alertRef = createRef<AlertModalRef>()
@@ -101,6 +102,7 @@ export const GlobalAlert = {
 export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
   children,
   AlertModal,
+  ignorePriority = false,
 }) => {
   const alertQueueRef = useRef<AlertData[]>([])
   const showingRef = useRef(false)
@@ -115,7 +117,6 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
     alertRef.current?.hide?.()
     showingRef.current = false
     currentAlertRef.current = null
-    // Process next alert in queue after a small delay to ensure state updates
     setTimeout(() => {
       processQueue()
     }, 50)
@@ -124,9 +125,8 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
   const processQueue = useCallback(() => {
     if (showingRef.current) return
 
-    // Show the last (most recent) item from the queue
     if (alertQueueRef.current.length > 0) {
-      const nextAlert = alertQueueRef.current.pop()! // Take from end (most recent)
+      const nextAlert = alertQueueRef.current.pop()! 
       
       showingRef.current = true
       currentAlertRef.current = nextAlert
@@ -150,27 +150,53 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
   const show = useCallback((options: AlertData) => {
     const alertOptions = { p: 0, ...options }
     
-    // Filter queue to keep only HIGH priority items before adding new item
-    alertQueueRef.current = alertQueueRef.current.filter(alert => alert.p === 1)
-    
-    // If something is currently showing, move it back to the queue
-    if (showingRef.current && currentAlertRef.current) {
-      // If the current alert is HIGH priority, put it back in the queue
-      if (currentAlertRef.current.p === 1) {
+    if (ignorePriority) {
+      if (showingRef.current && currentAlertRef.current) {
         alertQueueRef.current.push(currentAlertRef.current)
+        alertRef.current?.hide?.()
+        showingRef.current = false
+        currentAlertRef.current = null
       }
-      // Close the current alert
-      alertRef.current?.hide?.()
-      showingRef.current = false
-      currentAlertRef.current = null
+      
+      alertQueueRef.current.push(alertOptions)
+      
+      const latestAlert = alertQueueRef.current.pop()!
+      showingRef.current = true
+      currentAlertRef.current = latestAlert
+
+      const originalOnClose = latestAlert.onClose
+      const safeOnClose = () => {
+        try {
+          originalOnClose?.()
+        } finally {
+          alertRef.current?.hide?.()
+          showingRef.current = false
+          currentAlertRef.current = null
+          setTimeout(() => {
+            processQueue()
+          }, 50)
+        }
+      }
+      
+      alertRef.current?.show?.({
+        ...latestAlert,
+        onClose: safeOnClose,
+      })
+    } else {
+      alertQueueRef.current = alertQueueRef.current.filter(alert => alert.p === 1)
+      
+      if (showingRef.current && currentAlertRef.current) {
+        if (currentAlertRef.current.p === 1) {
+          alertQueueRef.current.push(currentAlertRef.current)
+        }
+        alertRef.current?.hide?.()
+        showingRef.current = false
+        currentAlertRef.current = null
+      }
+      alertQueueRef.current.push(alertOptions)
+      processQueue()
     }
-    
-    // Add the new alert to the end of the queue
-    alertQueueRef.current.push(alertOptions)
-    
-    // Show the latest (newest) alert immediately
-    processQueue()
-  }, [processQueue])
+  }, [processQueue, ignorePriority])
 
   useEffect(() => {
     mountedRef.current = true

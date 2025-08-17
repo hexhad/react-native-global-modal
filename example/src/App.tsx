@@ -22,10 +22,30 @@ const App: React.FC = () => {
     GlobalAlert.show({ message: 'HIGH 2', p: GlobalAlert.P.HIGH });
     GlobalAlert.show({ message: 'LOW 2', p: GlobalAlert.P.LOW });
   }
+  const onPressAdvanceAlertButtonHandler = () => {
+     GlobalAlert.show({
+      title: 'HIGH SHOWING ALERT 1',
+      p: GlobalAlert.P.HIGH,
+      message: 'HIGH SHOWING ALERT 1',
+      variant: GlobalAlert.TYPE.ERROR,
+      buttons: [
+        {
+          title: 'ERROR',
+          variant: GlobalAlert.TYPE.ERROR,
+          onPress: () => GlobalAlert.hide(),
+        },
+        {
+          title: 'ERROR',
+          variant: GlobalAlert.TYPE.ERROR,
+          onPress: () => GlobalAlert.hide(),
+        },
+      ],
+    });
+  }
 
   return (
     <GlobalAlertProvider
-      ignorePriority={true}
+      ignorePriority={!true}
       AlertModal={AlertModal}
       types={ALERT_TYPES}
       globalAlert={GlobalAlert}
@@ -33,6 +53,7 @@ const App: React.FC = () => {
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Global Alert</Text>
         <CustomButton title='Open Alerts' onPress={onPressAlertsButtonHandler} />
+        <CustomButton title='Open Advance Alert' onPress={onPressAdvanceAlertButtonHandler} />
       </View>
     </GlobalAlertProvider>
   );
