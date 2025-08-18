@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./docs/img/dark-banner.png" />
     <source media="(prefers-color-scheme: light)" srcset="./banner/ligh-banner.png" />
-    <img alt="globalAlert" src="./docs/img/ligh-banner.png" />
+    <img alt="globalAlert" src="./docs/img/light-banner.png" />
   </picture>
 </a>
 
