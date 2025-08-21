@@ -1,7 +1,4 @@
-// Enums
 export { ALERT_TYPE, PRIORITY } from './enums';
-
-// Types
 export type {
     AlertButton,
     AlertData,

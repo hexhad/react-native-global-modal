@@ -2,14 +2,20 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "@hexhad/react-native-global-modal": ["./src/index"]
+      "@hexhad/react-native-global-modal": [
+        "./src/index"
+      ]
     },
+    "declaration": true,
+    "declarationMap": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
