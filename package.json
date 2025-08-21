@@ -1,6 +1,6 @@
 {
   "name": "@hexhad/react-native-global-modal",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "A custom-built component that replicates the functionality of the React Native Alert, providing the same behavior with additional styling and customization options.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
