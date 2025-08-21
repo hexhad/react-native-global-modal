@@ -16,16 +16,47 @@ const ALERT_TYPES = {
 
 const App: React.FC = () => {
 
+const delayFor = (time: number = 200): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, time));
+};
+
+
+
   const onPressAlertsButtonHandler = () => {
-    GlobalAlert.show({ message: 'HIGH 1', p: GlobalAlert.P.HIGH });
-    GlobalAlert.show({ message: 'LOW 1', p: GlobalAlert.P.LOW });
-    GlobalAlert.show({ message: 'HIGH 2', p: GlobalAlert.P.HIGH });
-    GlobalAlert.show({ message: 'LOW 2', p: GlobalAlert.P.LOW });
+    GlobalAlert.show({ message: 'HIGH 1', priority: GlobalAlert.PRIORITY.HIGH });
+    GlobalAlert.show({ message: 'LOW 1', priority: GlobalAlert.PRIORITY.LOW });
+    GlobalAlert.show({ message: 'HIGH 2', priority: GlobalAlert.PRIORITY.HIGH });
+    GlobalAlert.show({ message: 'LOW 2', priority: GlobalAlert.PRIORITY.LOW });
+  }
+
+  const onPressCloseAllHandler = () => {
+    GlobalAlert.show({ message: 'HIGH 1', priority: GlobalAlert.PRIORITY.HIGH });
+    GlobalAlert.show({ message: 'LOW 1', priority: GlobalAlert.PRIORITY.LOW });
+    GlobalAlert.show({ message: 'HIGH 2', priority: GlobalAlert.PRIORITY.HIGH });
+    GlobalAlert.show({ message: 'LOW 2', priority: GlobalAlert.PRIORITY.LOW });
+
+    setTimeout(() => GlobalAlert.clearAll(), 2000)
+  }
+
+  const onPressWithDelayHandler = async () => {
+    GlobalAlert.show({ message: 'HIGH 1', priority: GlobalAlert.PRIORITY.HIGH });
+    await delayFor(1000)
+    GlobalAlert.show({ message: 'LOW 2', priority: GlobalAlert.PRIORITY.LOW });
+  }
+
+  const onPressMultipleAlertsButtonHandler = () => {
+    GlobalAlert.show({ message: 'HIGH 2', priority: GlobalAlert.PRIORITY.HIGH });
+
+    GlobalAlert.showMultiple([
+      { message: 'showMultiple HIGH 1', priority: GlobalAlert.PRIORITY.HIGH },
+      { message: 'showMultiple LOW 1', priority: GlobalAlert.PRIORITY.LOW },
+      { message: 'showMultiple HIGH 2', priority: GlobalAlert.PRIORITY.HIGH },
+    ]);
   }
   const onPressAdvanceAlertButtonHandler = () => {
-     GlobalAlert.show({
+    GlobalAlert.show({
       title: 'HIGH SHOWING ALERT 1',
-      p: GlobalAlert.P.HIGH,
+      priority: GlobalAlert.PRIORITY.HIGH,
       message: 'HIGH SHOWING ALERT 1',
       variant: GlobalAlert.TYPE.ERROR,
       buttons: [
@@ -54,6 +85,9 @@ const App: React.FC = () => {
         <Text>Global Alert</Text>
         <CustomButton title='Open Alerts' onPress={onPressAlertsButtonHandler} />
         <CustomButton title='Open Advance Alert' onPress={onPressAdvanceAlertButtonHandler} />
+        <CustomButton title='Open Multiple Alert' onPress={onPressMultipleAlertsButtonHandler} />
+        <CustomButton title='Close All' onPress={onPressCloseAllHandler} />
+        <CustomButton title='Delay' onPress={onPressWithDelayHandler} />
       </View>
     </GlobalAlertProvider>
   );

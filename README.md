@@ -1,7 +1,7 @@
 <a href="https://hexhad.github.io">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./docs/img/dark-banner.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./banner/ligh-banner.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/img/light-banner.png" />
     <img alt="globalAlert" src="./docs/img/light-banner.png" />
   </picture>
 </a>
@@ -15,8 +15,10 @@
 - ⚡ **TypeScript Support** - Full type safety out of the box
 - 🔄 **Smart Queue Management** - Intelligent alert queuing with priority handling
 - 🪝 **React Hooks** - Modern React patterns with useGlobalAlert hook
-- 🎭 **Multiple Alert Types** - Error, Warning, Success, Info, and more
+- 🎭 **Multiple Alert Types** - Error, Warning, Success, Info, Notice, Question, Loading, and Tips
 - ⚙️ **Flexible Configuration** - Optional priority enforcement and backdrop dismiss
+- 📚 **Multiple Alerts** - Show multiple alerts in sequence with `showMultiple`
+- 🎨 **Button Customization** - Rich button styling and behavior options
 
 ## Installation
 
@@ -64,9 +66,18 @@ const CustomAlertModal: React.FC<AlertModalProps> = ({ visible, data, onClose })
   if (!data) return null;
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.container}>
+    <Modal 
+      visible={visible} 
+      transparent 
+      animationType="fade"
+      onRequestClose={data.backdropDismiss ? onClose : undefined}
+    >
+      <TouchableOpacity 
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={data.backdropDismiss ? onClose : undefined}
+      >
+        <TouchableOpacity style={styles.container} activeOpacity={1}>
           {data.title && <Text style={styles.title}>{data.title}</Text>}
           {data.message && <Text style={styles.message}>{data.message}</Text>}
           
@@ -86,8 +97,8 @@ const CustomAlertModal: React.FC<AlertModalProps> = ({ visible, data, onClose })
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     </Modal>
   );
 };
@@ -172,7 +183,7 @@ GlobalAlert.show({
 GlobalAlert.show({
   title: 'Critical Error',
   message: 'Something went wrong!',
-  p: GlobalAlert.P.HIGH, // High priority
+  priority: GlobalAlert.PRIORITY.HIGH, // High priority
   type: GlobalAlert.TYPE.ERROR,
   buttons: [
     {
@@ -203,8 +214,27 @@ GlobalAlert.show({
   ],
 });
 
+// Show multiple alerts in sequence
+GlobalAlert.showMultiple([
+  {
+    title: 'First Alert',
+    message: 'This will show first',
+    type: GlobalAlert.TYPE.INFO,
+    buttons: [{ title: 'Next' }],
+  },
+  {
+    title: 'Second Alert',
+    message: 'This will show after the first is closed',
+    type: GlobalAlert.TYPE.SUCCESS,
+    buttons: [{ title: 'Done' }],
+  }
+]);
+
 // Hide current alert
 GlobalAlert.hide();
+
+// Clear all alerts (including queue)
+GlobalAlert.clearAll();
 ```
 
 #### Using React Hook (Declarative API)
@@ -222,7 +252,7 @@ const MyComponent: React.FC = () => {
       title: 'Confirm Action',
       message: 'Are you sure you want to proceed?',
       type: alert.TYPE.QUESTION,
-      p: alert.P.HIGH, // Ensure this shows immediately
+      priority: alert.PRIORITY.HIGH, // Ensure this shows immediately
       buttons: [
         {
           title: 'Cancel',
@@ -261,7 +291,7 @@ Main provider component that manages the global alert system.
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | `AlertModal` | `React.ComponentType<AlertModalProps>` | ✅ | - | Your custom alert modal component |
-| `children` | `React.ReactNode` | ✅ | - | Your app content |
+| `children` | `React.ReactNode` | ❌ | - | Your app content |
 | `types` | `Record<string, string>` | ❌ | `{}` | Custom alert types (merged with defaults) |
 | `globalAlert` | `GlobalAlertInstance` | ❌ | - | Custom global alert instance |
 | `ignorePriority` | `boolean` | ❌ | `false` | If true, always show the latest alert immediately |
@@ -272,15 +302,15 @@ Configuration object for alert content and behavior.
 
 ```tsx
 type AlertData = {
-  type?: string;           // Alert type (ERROR, SUCCESS, etc.)
-  variant?: string;        // Visual variant for buttons/styling
-  title?: string;          // Alert title
-  message?: string;        // Alert message
-  p?: number;             // Priority: 0 (LOW) or 1 (HIGH)
-  backdropDismiss?: boolean; // Allow dismissing by tapping backdrop
-  buttons?: AlertButton[]; // Array of action buttons
-  onClose?: () => void;    // Callback when alert closes
-  [key: string]: any;      // Additional custom properties
+  type?: string;              // Alert type (ERROR, SUCCESS, etc.)
+  variant?: string;           // Visual variant for buttons/styling  
+  title?: string;             // Alert title
+  message?: string;           // Alert message
+  priority?: number;          // Priority: 0 (LOW) or 1 (HIGH)
+  backdropDismiss?: boolean;  // Allow dismissing by tapping backdrop
+  buttons?: AlertButton[];    // Array of action buttons
+  onClose?: () => void;       // Callback when alert closes
+  [key: string]: any;         // Additional custom properties
 };
 ```
 
@@ -317,14 +347,16 @@ type AlertModalProps = {
 
 - `GlobalAlert.TYPE`: Predefined alert types
   - `ERROR`, `WARNING`, `SUCCESS`, `INFO`, `NOTICE`, `QUESTION`, `LOADING`, `TIP`
-- `GlobalAlert.P`: Priority levels
+- `GlobalAlert.PRIORITY`: Priority levels
   - `LOW: 0` (Low priority - default)
   - `HIGH: 1` (High priority)
 
 #### Methods
 
 - `GlobalAlert.show(options: AlertData)`: Show an alert
+- `GlobalAlert.showMultiple(options: AlertData[])`: Show multiple alerts in sequence
 - `GlobalAlert.hide()`: Hide the current alert
+- `GlobalAlert.clearAll()`: Hide current alert and clear the queue
 
 ### useGlobalAlert Hook
 
@@ -332,7 +364,7 @@ React hook that provides access to the alert system within components.
 
 ```tsx
 const alert = useGlobalAlert();
-// Returns: { show, hide, TYPE, P }
+// Returns: { show, showMultiple, hide, clearAll, TYPE, PRIORITY }
 ```
 
 **Note:** The hook will throw an error if used outside of `GlobalAlertProvider`.
@@ -342,8 +374,8 @@ const alert = useGlobalAlert();
 The alert system uses a sophisticated priority-based queue with LIFO (Last In, First Out) processing:
 
 ### Priority Levels
-- **Low Priority (`P.LOW = 0`)**: Default priority. Can be interrupted by any alert.
-- **High Priority (`P.HIGH = 1`)**: Interrupts low priority alerts and queues when interrupted by other high priority alerts.
+- **Low Priority (`PRIORITY.LOW = 0`)**: Default priority. Can be interrupted by any alert.
+- **High Priority (`PRIORITY.HIGH = 1`)**: Interrupts low priority alerts and queues when interrupted by other high priority alerts.
 
 ### Queue Behavior
 
@@ -372,7 +404,7 @@ const showLoading = () => {
   GlobalAlert.show({
     type: GlobalAlert.TYPE.LOADING,
     message: 'Please wait...',
-    p: GlobalAlert.P.HIGH,
+    priority: GlobalAlert.PRIORITY.HIGH,
     // No buttons = user must wait for programmatic dismissal
   });
   
@@ -429,7 +461,7 @@ const handleApiError = (error: Error, retryFn: () => void) => {
     title: 'Request Failed',
     message: error.message || 'An unexpected error occurred.',
     type: GlobalAlert.TYPE.ERROR,
-    p: GlobalAlert.P.HIGH, // Ensure it shows immediately
+    priority: GlobalAlert.PRIORITY.HIGH, // Ensure it shows immediately
     buttons: [
       {
         title: 'Retry',
@@ -460,7 +492,7 @@ const showDeleteConfirmation = (itemName: string, onConfirm: () => void) => {
     title: 'Delete Item',
     message: `Are you sure you want to delete "${itemName}"? This action cannot be undone.`,
     type: GlobalAlert.TYPE.QUESTION,
-    p: GlobalAlert.P.HIGH,
+    priority: GlobalAlert.PRIORITY.HIGH,
     buttons: [
       {
         title: 'Cancel',
@@ -480,6 +512,33 @@ const showDeleteConfirmation = (itemName: string, onConfirm: () => void) => {
 };
 ```
 
+### Multiple Alerts Demo
+
+```tsx
+const showMultipleAlertsDemo = () => {
+  GlobalAlert.showMultiple([
+    {
+      title: 'Welcome!',
+      message: 'Thank you for using our app',
+      type: GlobalAlert.TYPE.SUCCESS,
+      buttons: [{ title: 'Next' }],
+    },
+    {
+      title: 'New Features',
+      message: 'Check out what\'s new in this version',
+      type: GlobalAlert.TYPE.INFO,
+      buttons: [{ title: 'Continue' }],
+    },
+    {
+      title: 'Quick Tip',
+      message: 'You can customize alerts with your own styling',
+      type: GlobalAlert.TYPE.TIP,
+      buttons: [{ title: 'Got it!' }],
+    },
+  ]);
+};
+```
+
 ### Alert Queue Demo
 
 ```tsx
@@ -488,7 +547,7 @@ const showQueueDemo = () => {
   GlobalAlert.show({
     title: 'Low Priority 1',
     message: 'This is a low priority alert',
-    p: GlobalAlert.P.LOW,
+    priority: GlobalAlert.PRIORITY.LOW,
     buttons: [{ title: 'OK' }],
   });
   
@@ -497,7 +556,7 @@ const showQueueDemo = () => {
     GlobalAlert.show({
       title: 'High Priority',
       message: 'This high priority alert interrupts the low priority one',
-      p: GlobalAlert.P.HIGH,
+      priority: GlobalAlert.PRIORITY.HIGH,
       buttons: [{ title: 'Got it' }],
     });
   }, 1000);
@@ -507,7 +566,7 @@ const showQueueDemo = () => {
     GlobalAlert.show({
       title: 'Another High Priority',
       message: 'This will be queued and shown after the first high priority alert',
-      p: GlobalAlert.P.HIGH,
+      priority: GlobalAlert.PRIORITY.HIGH,
       buttons: [{ title: 'Understood' }],
     });
   }, 2000);
@@ -541,6 +600,24 @@ GlobalAlert.show({
 });
 ```
 
+### Using Custom Global Alert Instance
+
+```tsx
+import { createGlobalAlert } from '@hexhad/react-native-global-modal';
+
+const customAlert = createGlobalAlert({
+  SPECIAL: 'SPECIAL',
+  NOTIFICATION: 'NOTIFICATION',
+});
+
+// Use the custom instance
+customAlert.show({
+  type: customAlert.TYPE.SPECIAL,
+  title: 'Special Alert',
+  message: 'This uses a custom alert instance',
+});
+```
+
 ### Error Boundaries Integration
 
 ```tsx
@@ -550,7 +627,7 @@ class ErrorBoundary extends React.Component {
       title: 'Application Error',
       message: 'Something went wrong. The app will reload.',
       type: GlobalAlert.TYPE.ERROR,
-      p: GlobalAlert.P.HIGH,
+      priority: GlobalAlert.PRIORITY.HIGH,
       buttons: [
         {
           title: 'Reload App',
@@ -588,19 +665,22 @@ import type {
 const showTypedAlert = (config: AlertData): void => {
   GlobalAlert.show({
     ...config,
-    p: config.p ?? GlobalAlert.P.LOW, // Default to low priority
+    priority: config.priority ?? GlobalAlert.PRIORITY.LOW, // Default to low priority
   });
 };
 ```
 
 ## Best Practices
 
-1. **Use High Priority Sparingly** - Reserve `P.HIGH` for critical alerts that must interrupt the user
+1. **Use High Priority Sparingly** - Reserve `PRIORITY.HIGH` for critical alerts that must interrupt the user
 2. **Provide Clear Actions** - Always include actionable buttons unless the alert is purely informational
 3. **Handle onClose Properly** - Use `onClose` callback for cleanup when alerts are dismissed
 4. **Custom Properties** - Leverage custom properties to pass additional data to your modal component
 5. **Error Handling** - Always handle button press errors gracefully
 6. **Queue Management** - Consider using `ignorePriority={true}` for simpler queue behavior if priority handling isn't needed
+7. **Backdrop Dismiss** - Use `backdropDismiss` for non-critical alerts to improve UX
+8. **Multiple Alerts** - Use `showMultiple()` for onboarding flows or sequential information
+9. **Button Variants** - Use consistent button variants across your app for better UX
 
 ## Troubleshooting
 
@@ -620,6 +700,10 @@ const showTypedAlert = (config: AlertData): void => {
 4. **Queue not working as expected**
    - Review the priority system documentation
    - Consider using `ignorePriority={true}` for simpler behavior
+
+5. **Backdrop dismiss not working**
+   - Ensure your modal handles `onRequestClose` and touch events on the backdrop
+   - Check that `backdropDismiss` is set to `true` in your alert data
 
 ## Contributing
 
