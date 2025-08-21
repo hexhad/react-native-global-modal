@@ -3,13 +3,11 @@
   "version": "0.1.11",
   "description": "A custom-built component that replicates the functionality of the React Native Alert, providing the same behavior with additional styling and customization options.",
   "main": "./lib/module/index.js",
-  "types": "./lib/typescript/types.d.ts",
+  "types": "./lib/typescript/src/index.d.ts",
   "exports": {
     ".": {
-      "source": "./src/index.ts",
-      "types": "./lib/typescript/types.d.ts",
-      "import": "./lib/module/index.js",
-      "require": "./lib/module/index.js",
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
     },
     "./package.json": "./package.json"
@@ -58,8 +56,7 @@
   },
   "homepage": "https://github.com/hexhad/react-native-global-modal#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19.6.0",
@@ -144,8 +141,7 @@
       [
         "typescript",
         {
-          "project": "tsconfig.build.json",
-          "tsc": "./node_modules/.bin/tsc"
+          "project": "tsconfig.build.json"
         }
       ]
     ]
