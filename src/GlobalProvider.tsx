@@ -181,7 +181,7 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
                 console.error('GlobalAlertProvider unmounted; cannot show alert.', opts);
             GlobalAlert.hide = () => { };
             GlobalAlert.clearAll = () => { };
-            GlobalAlert.showMultiple = (opts: AlertData[]) => { };
+            GlobalAlert.showMultiple = () => { };
             alertQueueRef.current = [];
             showingRef.current = false;
             currentAlertRef.current = null;
