@@ -25,7 +25,7 @@ export type AlertData = {
   backdropDismiss?: boolean;
   buttons?: AlertButton[];
   onClose?: () => void;
-  dismissIn?: number; // Auto-dismiss timeout in milliseconds
+  dismissIn?: number;
   [key: string]: any;
 };
 
@@ -91,7 +91,6 @@ const AlertModalWrapper = forwardRef<
 
   useImperativeHandle(ref, () => ({
     show: (options: AlertData) => {
-      // Clear any existing timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -100,18 +99,15 @@ const AlertModalWrapper = forwardRef<
       setAlertData(options);
       setVisible(true);
 
-      // Set up auto-dismiss timeout if specified
       if (options.dismissIn && options.dismissIn > 0) {
         timeoutRef.current = setTimeout(() => {
           setVisible(false);
           setAlertData(null);
-          // Call the onClose callback if it exists
           options.onClose?.();
         }, options.dismissIn);
       }
     },
     hide: () => {
-      // Clear timeout when manually hiding
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -120,7 +116,6 @@ const AlertModalWrapper = forwardRef<
       setAlertData(null);
     },
     clearAll: () => {
-      // Clear timeout when clearing all
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -130,7 +125,6 @@ const AlertModalWrapper = forwardRef<
     },
   }));
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -213,7 +207,6 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
         try {
           originalOnClose?.();
         } finally {
-          // Inline hide logic to avoid circular dependency
           clearCurrentTimeout();
           alertRef.current?.hide?.();
           showingRef.current = false;
@@ -229,7 +222,6 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
         onClose: safeOnClose,
       };
 
-      // Set up auto-dismiss timeout for queued alerts
       if (nextAlert.dismissIn && nextAlert.dismissIn > 0) {
         currentTimeoutRef.current = setTimeout(() => {
           safeOnClose();
@@ -300,7 +292,6 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
             onClose: safeOnClose,
           };
 
-          // Set up auto-dismiss timeout
           if (latestAlert.dismissIn && latestAlert.dismissIn > 0) {
             currentTimeoutRef.current = setTimeout(() => {
               safeOnClose();
@@ -369,7 +360,6 @@ export const GlobalAlertProvider: React.FC<GlobalAlertProviderProps> = ({
           onClose: safeOnClose,
         };
 
-        // Set up auto-dismiss timeout
         if (latestAlert.dismissIn && latestAlert.dismissIn > 0) {
           currentTimeoutRef.current = setTimeout(() => {
             safeOnClose();
